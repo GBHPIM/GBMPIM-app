@@ -11,12 +11,16 @@ export class AppComponent implements OnInit {
   private lat: number;
   private lng: number;
   private map: any;
+  private addressStart = '';
+  private addressEnd = '';
+  private currentLatlng;
 
   constructor() { }
   ngOnInit() {
     navigator.geolocation.getCurrentPosition(pos => {
+      this.currentLatlng = new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude);
       let mapProp = {
-        center: new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude),
+        center: this.currentLatlng,
         zoom: 15,
         mapTypeId: google.maps.MapTypeId.ROADMAP
       };
@@ -24,15 +28,15 @@ export class AppComponent implements OnInit {
     })
   }
 
-  mapRoute() {
+  mapRoute(start = 'chicago, il', fin = 'st louis, mo') {
     let directionsService = new google.maps.DirectionsService;
     let directionsDisplay = new google.maps.DirectionsRenderer;
 
     directionsDisplay.setMap(this.map);
 
     directionsService.route({
-      origin: 'chicago, il',
-      destination: 'st louis, mo',
+      origin: start,
+      destination: fin,
       travelMode: google.maps.TravelMode.DRIVING
     }, function (response, status) {
       if (status === google.maps.DirectionsStatus.OK) {
@@ -41,5 +45,24 @@ export class AppComponent implements OnInit {
         window.alert('Directions request failed due to ' + status);
       }
     });
+  }
+
+  getAddressOnChangeOrigin(place, l) {
+    console.log(place);
+    this.addressStart = place.address_components.map((x) => x.short_name).join(' ');
+    if (this.addressEnd !== '') {
+      this.mapRoute(this.addressStart, this.addressEnd);
+    } 
+  }
+
+  
+  getAddressOnChangeDestination(place, l) {
+    console.log(place);
+    this.addressEnd = place.address_components.map((x) => x.short_name).join(' ');
+    if (this.addressStart !== '') {
+      this.mapRoute(this.addressStart, this.addressEnd);
+    } else {
+      this.mapRoute(this.currentLatlng, this.addressEnd);
+    }
   }
 }
