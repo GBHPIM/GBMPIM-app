@@ -1,3 +1,7 @@
 <div id="googleMap" style="width:500px;height:380px;"></div>
-<p>click for chi - lou route</p>
-<button (click)="mapRoute()">click me</button>
+
+<input type="text" class="form-control" placeholder="start" name="start" [(ngModel)]="address1" #LocationCtrl1="ngModel"
+        GooglePlaces (setAddress)="getAddressOnChangeOrigin($event,LocationCtrl)">
+        
+<input type="text" class="form-control" placeholder="end" name="end" [(ngModel)]="address2" #LocationCtrl2="ngModel"
+    GooglePlaces (setAddress)="getAddressOnChangeDestination($event,LocationCtrl)">
